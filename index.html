@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Trabajo Practico 01</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>Hola ni nombre es {{ nombre }} , tengo {{ edad }} años y vivo en {{ ciudad}}.</h1>
+        
+    </div>
+
+    <script>
+      var app =  new Vue({
+            el: '#app',
+            data: {
+                nombre: 'Ana Garcia',
+                edad: 30,
+                ciudad:'Tupungato',
+                
+                }
+            
+        })
+    </script>
+</body>
+</html>
