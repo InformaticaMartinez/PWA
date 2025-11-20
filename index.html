@@ -5,6 +5,7 @@
     <title>TP2 – Integrado</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 </head>
 
 <body>
@@ -55,6 +56,21 @@
         </li>
     </ul>
 
+    <h2>Paso 3 – Lista de los 10 primeros posts</h2>
+
+    <div>
+        <div v-for="p in listaPosts" :key="p.id" class="post-item" @click="mostrarComentarios(p.id)">
+            <strong>{{ p.id }}</strong> — {{ p.title }}
+        </div>
+    </div>
+
+    <h3>Comentarios del Post Seleccionado</h3>
+    <ul>
+        <li v-for="c in listaComentariosPost" :key="c.id">
+            {{ c.email }} — {{ c.body }}
+        </li>
+    </ul>
+
 </div>
 
 <script>
@@ -81,7 +97,10 @@ createApp({
 
             postId: "",
             post: {},
-            comments: []
+            comments: [],
+
+            listaPosts: [],
+            listaComentariosPost: []
         };
     },
 
@@ -136,6 +155,17 @@ createApp({
 
         async cargarComments() {
             this.comments = await this.obtenerComments(this.postId);
+        },
+
+        async mostrarComentarios(id) {
+            this.listaComentariosPost = await this.obtenerComments(id);
+        }
+    },
+
+    async mounted() {
+        for (let i = 1; i <= 10; i++) {
+            const p = await this.obtenerPost(i);
+            this.listaPosts.push(p);
         }
     },
 
@@ -148,15 +178,13 @@ createApp({
         this.registrar("beforeMount");
     },
 
-    mounted() {
-        this.registrar("mounted");
-    },
-
     beforeUpdate() {
         if (this.primeraActualizacion) {
             this.registrar("beforeUpdate");
         }
     },
+
+    mountedHook: false,
 
     updated() {
         if (this.primeraActualizacion) {
