@@ -1,71 +1,145 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <title>Trabajo Practico 01</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>TP2 – Paso 1 (Integrado con TP1)</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .completada { text-decoration: line-through; color: #888; }
+        li { margin: 4px 0; }
+        .eventos-lista { margin-top: 30px; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        strong { color: #007bff; }
+    </style>
 </head>
 
 <body>
-    <div id="app">
-        <h1>Hola ni nombre es {{ nombre }} , tengo {{ edad }} años y vivo en {{ ciudad}}.</h1>
-        <h2>Contador: {{ contador }}</h2>
-        <button v-on:click="contador++">Incrementar</button>
-        <button v-on:click="contador--">Decrementar</button>
-        <br><br>
-        <input v-model="nuevaTarea" placeholder="Escribe una tarea">
-        <button @click="agregarTarea">Añadir Tarea</button>
+<div id="app">
+    <h1>Hola mi nombre es {{ nombre }}, tengo {{ edad }} años y vivo en {{ ciudad }}</h1>
+
+    <h2>Contador: {{ contador }}</h2>
+    <button @click="contador++">+</button>
+    <button @click="contador--">−</button>
+
+    <br><br>
+    <input v-model="nuevaTarea" placeholder="Escribe una tarea">
+    <button @click="agregarTarea">Añadir Tarea</button>
+
+    <ul>
+        <li v-for="t in tareas" :key="t.id">
+            <input type="checkbox" v-model="t.completada">
+            <span :class="{ completada: t.completada }">{{ t.texto }}</span>
+        </li>
+    </ul>
+
+    <p>Total de tareas: {{ totalTareas }}</p>
+    <p>Tareas pendientes: {{ tareasPendientes }}</p>
+
+    <div class="eventos-lista">
+        <h2>Paso 1 – Lista de Eventos del Ciclo de Vida (Vue 3)</h2>
 
         <ul>
-            <li v-for="tarea in tareas" :key="tarea.id">
-                <input type="checkbox" v-model="tarea.completada">
-                <span :class="{ completada: tarea.completada }">{{ tarea.texto }}</span>
+            <li v-for="ev in listaeventos" :key="ev.id">
+                <strong>{{ ev.id }}</strong> — {{ ev.nombre }} — {{ ev.timestamp }}
             </li>
         </ul>
-
-        <p>Total de Tareas: {{ totalTareas }}</p>
-        <p>Tareas Pendientes: {{ tareasPendientes }}</p>
     </div>
+</div>
 
-    <script>
-        var app = new Vue({
-            el: '#app',
-            data: {
-                nombre: 'Ana Garcia',
-                edad: 30,
-                ciudad: 'Tupungato',
-                contador: 0,
-                nuevaTarea: '',
-                tareas: [
-                    { id: 1, texto: 'Aprender Vue', completada: false },
-                    { id: 2, texto: 'Aprender PWA', completada: false },
-                    { id: 3, texto: 'Aprender Propiedades Computadas', completada: false },
-                ]
+<script>
+const { createApp } = Vue;
 
-            },
-            methods: {
-                agregarTarea() {
-                    if (this.nuevaTarea.trim() !== "") {
-                        this.tareas.push({
-                            id: this.nextId++,
-                            texto: this.nuevaTarea,
-                            completada: false
-                        });
-                        this.nuevaTarea = "";
-                    }
-                }
-            },
-            computed: {
-                totalTareas() {
-                    return this.tareas.length;
-                },
-                tareasPendientes() {
-                    return this.tareas.filter(t => !t.completada).length;
-                }
+createApp({
+    data() {
+        return {
+            nombre: "Julio",
+            edad: 48,
+            ciudad: "General Roca",
+            contador: 0,
+            nuevaTarea: "",
+            nextId: 4,
+            tareas: [
+                { id: 1, texto: "Aprender Vue", completada: false },
+                { id: 2, texto: "Aprender PWA", completada: false },
+                { id: 3, texto: "Aprender COMPUTED", completada: false },
+            ],
+            listaeventos: [],
+            nextEventId: 1,
+            primeraActualizacion: true 
+        };
+    },
+
+    computed: {
+        totalTareas() {
+            return this.tareas.length;
+        },
+        tareasPendientes() {
+            return this.tareas.filter(t => !t.completada).length;
+        }
+    },
+
+    methods: {
+        agregarTarea() {
+            if (this.nuevaTarea.trim() !== "") {
+                this.tareas.push({
+                    id: this.nextId++,
+                    texto: this.nuevaTarea,
+                    completada: false
+                });
             }
-        });
-    </script>
-</body>
+            this.nuevaTarea = "";
+        },
 
+        registrar(nombre) {
+            this.listaeventos.push({
+                id: this.nextEventId++,
+                nombre,
+                timestamp: Date.now()
+            });
+        }
+    },
+
+    // ----- CICLO DE VIDA VUE 3 -----
+    beforeCreate() {},
+
+    created() {
+        this.registrar("beforeCreate");
+        this.registrar("created");
+    },
+
+    beforeMount() {
+        this.registrar("beforeMount");
+    },
+
+    mounted() {
+        this.registrar("mounted");
+    },
+
+    beforeUpdate() {
+        if (this.primeraActualizacion) {
+            this.registrar("beforeUpdate");
+        }
+    },
+
+    updated() {
+        if (this.primeraActualizacion) {
+            this.registrar("updated");
+            this.primeraActualizacion = false;
+        }
+    },
+
+    beforeUnmount() {
+        this.registrar("beforeUnmount");
+    },
+
+    unmounted() {
+        this.registrar("unmounted");
+    }
+
+})
+.mount("#app");
+</script>
+
+</body>
 </html>
